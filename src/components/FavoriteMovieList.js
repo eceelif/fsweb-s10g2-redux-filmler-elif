@@ -1,18 +1,20 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import {removeFavorite} from '../actions/favoritesActions';
+import { removeFavorite } from '../actions/favoritesActions';
 
-
-const FavoriteMovieList = (props) => {
-  const favorites = useSelector(store => store.favorites.favorites.Film)
-
-  const dispatcher = useDispatch()
+const FavoriteMovieList = ({ displayFavorites }) => {
+  const favorites = useSelector(store => store.favorites.favorites.Film || []);
+  const dispatcher = useDispatch();
 
   const removeFavMovieHandler = (e) => {
     const dataId = e.target.getAttribute('data-id');
     console.log("data-id : ", dataId);
     dispatcher(removeFavorite(dataId));
+  };
+
+  if (!displayFavorites) {
+    return null; // Favoriler gizli ise bileşeni render etme
   }
 
   return (
@@ -21,21 +23,20 @@ const FavoriteMovieList = (props) => {
       <div className="pt-3 text-sm">
         {
           favorites.map(movie => (
-            <Link key={movie.id} data-id={movie.id} className="py-1 flex gap-2 justify-between" to=''
-              onClick={
-                (e)=>{
-                  e.preventDefault(); 
-                  dispatcher(removeFavorite(movie.id));
-              }} >
-              {movie.title}
-              <span className="material-icons hover:text-red-600 text-[18px]">remove_circle</span>
-            </Link>
+            <div key={movie.id} className="py-1 flex gap-2 justify-between">
+              <Link to='' className="flex-1">
+                {movie.title}
+              </Link>
+              <span data-id={movie.id} className="material-icons hover:text-red-600 text-[18px]"
+                onClick={removeFavMovieHandler}>
+                remove_circle
+              </span>
+            </div>
           ))
         }
       </div>
     </div>
   );
 }
-
 
 export default FavoriteMovieList;
